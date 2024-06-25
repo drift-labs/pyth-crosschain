@@ -51,6 +51,24 @@ impl accounts::Initialize {
     }
 }
 
+impl accounts::InitPriceUpdate {
+    pub fn populate(
+        payer: Pubkey,
+        write_authority: Pubkey,
+        price_update_account: Pubkey,
+    ) -> Self {
+        let config = get_config_address();
+        accounts::InitPriceUpdate {
+            payer,
+            config,
+            price_update_account,
+            write_authority,
+            system_program: system_program::ID,
+        }
+    }
+}
+
+
 impl accounts::PostUpdateAtomic {
     pub fn populate(
         payer: Pubkey,
@@ -127,6 +145,28 @@ impl instruction::Initialize {
             program_id: ID,
             accounts:   accounts::Initialize::populate(payer).to_account_metas(None),
             data:       instruction::Initialize { initial_config }.data(),
+        }
+    }
+}
+
+impl instruction::InitPriceUpdate {
+    pub fn populate(
+        payer: Pubkey,
+        write_authority: Pubkey,
+        price_update_account: Pubkey,
+    ) -> Instruction {
+        let post_update_accounts = accounts::InitPriceUpdate::populate(
+            payer,
+            write_authority,
+            price_update_account,
+        )
+            .to_account_metas(None);
+        Instruction {
+            program_id: ID,
+            accounts:   post_update_accounts,
+            data:       instruction::InitPriceUpdate {
+            }
+                .data(),
         }
     }
 }

@@ -31,6 +31,7 @@ use {
         },
     },
     solana_program::{
+        pubkey,
         keccak,
         program_memory::sol_memcpy,
         secp256k1_recover::secp256k1_recover,
@@ -54,6 +55,17 @@ pub mod error;
 pub mod sdk;
 
 declare_id!(pyth_solana_receiver_sdk::ID);
+
+pub const WORMHOLE_ID: Pubkey = pubkey!("HDwcJBJXjL9FpJ7UBsYBtaDjsBUhuLCUYoz3zr8SWWaQ");
+
+pub const MINIMUM_SIGNERS : u8 = 3;
+
+pub const VALID_DATA_SOURCES : [DataSource; 1] = [
+    DataSource {
+        chain: 26,
+        emitter: pubkey!("G9LV2mp9ua1znRAfYwZz5cPiJMAbo1T6mbjdQsDZuMJg")
+    }
+];
 
 #[program]
 pub mod pyth_solana_receiver {
@@ -146,9 +158,8 @@ pub mod pyth_solana_receiver {
         ctx: Context<PostUpdateAtomic>,
         params: PostUpdateAtomicParams,
     ) -> Result<()> {
-        let config = &ctx.accounts.config;
         let guardian_set =
-            deserialize_guardian_set_checked(&ctx.accounts.guardian_set, &config.wormhole)?;
+            deserialize_guardian_set_checked(&ctx.accounts.guardian_set, &WORMHOLE_ID)?;
 
         // This section is borrowed from https://github.com/wormhole-foundation/wormhole/blob/wen/solana-rewrite/solana/programs/core-bridge/src/processor/parse_and_verify_vaa/verify_encoded_vaa_v1.rs#L59
         let vaa = Vaa::parse(&params.vaa).map_err(|_| ReceiverError::DeserializeVaaFailed)?;
@@ -167,7 +178,7 @@ pub mod pyth_solana_receiver {
         let quorum = quorum(guardian_keys.len());
         require_gte!(
             vaa.signature_count(),
-            config.minimum_signatures,
+            MINIMUM_SIGNERS,
             ReceiverError::InsufficientGuardianSignatures
         );
         let verification_level = if usize::from(vaa.signature_count()) >= quorum {
@@ -214,7 +225,6 @@ pub mod pyth_solana_receiver {
         };
 
         post_price_update_from_vaa(
-            config,
             payer,
             write_authority,
             price_update_account,
@@ -230,7 +240,6 @@ pub mod pyth_solana_receiver {
     /// This should be called after the client has already verified the Vaa via the Wormhole contract.
     /// Check out target_chains/solana/cli/src/main.rs for an example of how to do this.
     pub fn post_update(ctx: Context<PostUpdate>, params: PostUpdateParams) -> Result<()> {
-        let config = &ctx.accounts.config;
         let payer: &Signer<'_> = &ctx.accounts.payer;
         let write_authority: &Signer<'_> = &ctx.accounts.write_authority;
         let encoded_vaa = VaaAccount::load(&ctx.accounts.encoded_vaa)?; // IMPORTANT: This line checks that the encoded_vaa has ProcessingStatus::Verified. This check is critical otherwise the program could be tricked into accepting unverified VAAs.
@@ -244,7 +253,6 @@ pub mod pyth_solana_receiver {
         };
 
         post_price_update_from_vaa(
-            config,
             payer,
             write_authority,
             price_update_account,
@@ -297,8 +305,6 @@ pub struct AcceptGovernanceAuthorityTransfer<'info> {
 pub struct InitPriceUpdate<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
-    #[account(seeds = [CONFIG_SEED.as_ref()], bump)]
-    pub config: Account<'info, Config>,
     #[account(init_if_needed, payer = payer, space = PriceUpdateV2::LEN)]
     pub price_update_account: Account<'info, PriceUpdateV2>,
     pub system_program: Program<'info, System>,
@@ -311,11 +317,9 @@ pub struct InitPriceUpdate<'info> {
 pub struct PostUpdate<'info> {
     #[account(mut)]
     pub payer:                Signer<'info>,
-    #[account(owner = config.wormhole @ ReceiverError::WrongVaaOwner)]
+    #[account(owner = WORMHOLE_ID @ ReceiverError::WrongVaaOwner)]
     /// CHECK: We aren't deserializing the VAA here but later with VaaAccount::load, which is the recommended way
     pub encoded_vaa:          AccountInfo<'info>,
-    #[account(seeds = [CONFIG_SEED.as_ref()], bump)]
-    pub config:               Account<'info, Config>,
     /// The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     /// Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
     #[account(mut, constraint = price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority,)]
@@ -331,10 +335,8 @@ pub struct PostUpdateAtomic<'info> {
     /// CHECK: We can't use AccountVariant::<GuardianSet> here because its owner is hardcoded as the "official" Wormhole program and we want to get the wormhole address from the config.
     /// Instead we do the same steps in deserialize_guardian_set_checked.
     #[account(
-        owner = config.wormhole @ ReceiverError::WrongGuardianSetOwner)]
+        owner = WORMHOLE_ID @ ReceiverError::WrongGuardianSetOwner)]
     pub guardian_set:         AccountInfo<'info>,
-    #[account(seeds = [CONFIG_SEED.as_ref()], bump)]
-    pub config:               Account<'info, Config>,
     /// The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     /// Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
     #[account(mut, constraint = price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority)]
@@ -387,7 +389,6 @@ struct VaaComponents {
 }
 
 fn post_price_update_from_vaa<'info>(
-    config: &Account<'info, Config>,
     payer: &Signer<'info>,
     write_authority: &Signer<'info>,
     price_update_account: &mut Account<'_, PriceUpdateV2>,
@@ -395,7 +396,7 @@ fn post_price_update_from_vaa<'info>(
     vaa_payload: &[u8],
     price_update: &MerklePriceUpdate,
 ) -> Result<()> {
-    let valid_data_source = config.valid_data_sources.iter().any(|x| {
+    let valid_data_source = VALID_DATA_SOURCES.iter().any(|x| {
         *x == DataSource {
             chain:   vaa_components.emitter_chain,
             emitter: Pubkey::from(vaa_components.emitter_address),

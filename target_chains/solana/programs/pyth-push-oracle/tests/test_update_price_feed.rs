@@ -32,10 +32,13 @@ use {
         rent::Rent,
         signer::Signer,
     },
+    solana_program::{pubkey, pubkey::Pubkey}
 };
 
 const DEFAULT_SHARD: u16 = 0;
 const SECOND_SHARD: u16 = 1;
+
+pub const PYTHNET_PUBKEY : Pubkey = pubkey!("G9LV2mp9ua1znRAfYwZz5cPiJMAbo1T6mbjdQsDZuMJg");
 
 #[tokio::test]
 async fn test_update_price_feed() {

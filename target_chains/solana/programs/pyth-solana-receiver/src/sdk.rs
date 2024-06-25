@@ -57,10 +57,8 @@ impl accounts::InitPriceUpdate {
         write_authority: Pubkey,
         price_update_account: Pubkey,
     ) -> Self {
-        let config = get_config_address();
         accounts::InitPriceUpdate {
             payer,
-            config,
             price_update_account,
             write_authority,
             system_program: system_program::ID,
@@ -77,14 +75,12 @@ impl accounts::PostUpdateAtomic {
         wormhole_address: Pubkey,
         guardian_set_index: u32,
     ) -> Self {
-        let config = get_config_address();
 
         let guardian_set = get_guardian_set_address(wormhole_address, guardian_set_index);
 
         accounts::PostUpdateAtomic {
             payer,
             guardian_set,
-            config,
             price_update_account,
             write_authority,
         }
@@ -98,11 +94,9 @@ impl accounts::PostUpdate {
         encoded_vaa: Pubkey,
         price_update_account: Pubkey,
     ) -> Self {
-        let config = get_config_address();
         accounts::PostUpdate {
             payer,
             encoded_vaa,
-            config,
             price_update_account,
             write_authority,
         }

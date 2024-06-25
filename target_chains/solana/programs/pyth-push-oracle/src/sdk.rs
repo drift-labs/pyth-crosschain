@@ -33,7 +33,6 @@ impl accounts::InitPriceFeed {
     ) -> Self {
         accounts::InitPriceFeed {
             payer,
-            config: get_config_address(),
             price_feed_account: get_price_feed_address(shard_id, feed_id),
             system_program: system_program::ID,
             pyth_solana_receiver: pyth_solana_receiver_sdk::ID,
@@ -72,7 +71,6 @@ impl accounts::UpdatePriceFeed {
         accounts::UpdatePriceFeed {
             payer,
             encoded_vaa,
-            config: get_config_address(),
             price_feed_account: get_price_feed_address(shard_id, feed_id),
             pyth_solana_receiver: pyth_solana_receiver_sdk::ID,
             system_program: system_program::ID,

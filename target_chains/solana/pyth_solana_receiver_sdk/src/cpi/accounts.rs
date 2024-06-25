@@ -66,7 +66,6 @@ pub struct PostUpdateAtomic<'info> {
     ///Instead we do the same steps in deserialize_guardian_set_checked.
     pub guardian_set:         anchor_lang::solana_program::account_info::AccountInfo<'info>,
     pub config:               anchor_lang::solana_program::account_info::AccountInfo<'info>,
-    pub treasury:             anchor_lang::solana_program::account_info::AccountInfo<'info>,
     ///The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     ///Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
     pub price_update_account: anchor_lang::solana_program::account_info::AccountInfo<'info>,
@@ -96,10 +95,6 @@ impl<'info> anchor_lang::ToAccountMetas for PostUpdateAtomic<'info> {
             ),
         );
         account_metas.push(anchor_lang::solana_program::instruction::AccountMeta::new(
-            anchor_lang::Key::key(&self.treasury),
-            false,
-        ));
-        account_metas.push(anchor_lang::solana_program::instruction::AccountMeta::new(
             anchor_lang::Key::key(&self.price_update_account),
             true,
         ));
@@ -124,9 +119,6 @@ impl<'info> anchor_lang::ToAccountInfos<'info> for PostUpdateAtomic<'info> {
         ));
         account_infos.extend(anchor_lang::ToAccountInfos::to_account_infos(&self.config));
         account_infos.extend(anchor_lang::ToAccountInfos::to_account_infos(
-            &self.treasury,
-        ));
-        account_infos.extend(anchor_lang::ToAccountInfos::to_account_infos(
             &self.price_update_account,
         ));
         account_infos.extend(anchor_lang::ToAccountInfos::to_account_infos(
@@ -140,7 +132,6 @@ pub struct PostUpdate<'info> {
     pub payer:                anchor_lang::solana_program::account_info::AccountInfo<'info>,
     pub encoded_vaa:          anchor_lang::solana_program::account_info::AccountInfo<'info>,
     pub config:               anchor_lang::solana_program::account_info::AccountInfo<'info>,
-    pub treasury:             anchor_lang::solana_program::account_info::AccountInfo<'info>,
     ///The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     ///Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
     pub price_update_account: anchor_lang::solana_program::account_info::AccountInfo<'info>,
@@ -170,10 +161,6 @@ impl<'info> anchor_lang::ToAccountMetas for PostUpdate<'info> {
             ),
         );
         account_metas.push(anchor_lang::solana_program::instruction::AccountMeta::new(
-            anchor_lang::Key::key(&self.treasury),
-            false,
-        ));
-        account_metas.push(anchor_lang::solana_program::instruction::AccountMeta::new(
             anchor_lang::Key::key(&self.price_update_account),
             true,
         ));
@@ -197,9 +184,6 @@ impl<'info> anchor_lang::ToAccountInfos<'info> for PostUpdate<'info> {
             &self.encoded_vaa,
         ));
         account_infos.extend(anchor_lang::ToAccountInfos::to_account_infos(&self.config));
-        account_infos.extend(anchor_lang::ToAccountInfos::to_account_infos(
-            &self.treasury,
-        ));
         account_infos.extend(anchor_lang::ToAccountInfos::to_account_infos(
             &self.price_update_account,
         ));

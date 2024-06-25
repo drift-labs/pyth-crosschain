@@ -97,7 +97,6 @@ async fn test_invalid_wormhole_message() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa,
                     merkle_price_updates[0].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster],
                 None
@@ -156,7 +155,6 @@ async fn test_invalid_update_message() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa,
                     merkle_price_updates[0].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster],
                 None,
@@ -231,7 +229,6 @@ async fn test_post_price_update_from_vaa() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa.clone(),
                     merkle_price_updates2[0].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster],
                 None,
@@ -254,7 +251,6 @@ async fn test_post_price_update_from_vaa() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa.clone(),
                     merkle_price_updates[2].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster],
                 None,
@@ -294,7 +290,6 @@ async fn test_post_price_update_from_vaa() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa.clone(),
                     merkle_price_updates[0].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster],
                 None,
@@ -333,7 +328,6 @@ async fn test_post_price_update_from_vaa() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa.clone(),
                     merkle_price_updates[0].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster],
                 None,
@@ -371,7 +365,6 @@ async fn test_post_price_update_from_vaa() {
                 DEFAULT_GUARDIAN_SET_INDEX,
                 vaa.clone(),
                 merkle_price_updates[0].clone(),
-                DEFAULT_TREASURY_ID,
             ),
             &vec![&poster],
             None,
@@ -409,7 +402,6 @@ async fn test_post_price_update_from_vaa() {
                 DEFAULT_GUARDIAN_SET_INDEX,
                 vaa.clone(),
                 merkle_price_updates[0].clone(),
-                DEFAULT_TREASURY_ID,
             ),
             &vec![&poster, &poster_2],
             None,
@@ -520,7 +512,6 @@ async fn test_post_price_update_from_vaa() {
                 DEFAULT_GUARDIAN_SET_INDEX,
                 vaa.clone(),
                 merkle_price_updates[1].clone(),
-                DEFAULT_TREASURY_ID,
             ),
             &vec![&poster],
             None,
@@ -557,7 +548,6 @@ async fn test_post_price_update_from_vaa() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa.clone(),
                     merkle_price_updates[0].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster_2],
                 None,
@@ -580,7 +570,6 @@ async fn test_post_price_update_from_vaa() {
                     DEFAULT_GUARDIAN_SET_INDEX,
                     vaa.clone(),
                     merkle_price_updates[0].clone(),
-                    DEFAULT_TREASURY_ID
                 ),
                 &vec![&poster, &poster_2],
                 None,

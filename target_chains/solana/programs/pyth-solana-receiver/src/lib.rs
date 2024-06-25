@@ -205,7 +205,6 @@ pub mod pyth_solana_receiver {
 
         let payer = &ctx.accounts.payer;
         let write_authority: &Signer<'_> = &ctx.accounts.write_authority;
-        let treasury = &ctx.accounts.treasury;
         let price_update_account = &mut ctx.accounts.price_update_account;
 
         let vaa_components = VaaComponents {
@@ -218,7 +217,6 @@ pub mod pyth_solana_receiver {
             config,
             payer,
             write_authority,
-            treasury,
             price_update_account,
             &vaa_components,
             vaa.payload().as_ref(),
@@ -236,7 +234,6 @@ pub mod pyth_solana_receiver {
         let payer: &Signer<'_> = &ctx.accounts.payer;
         let write_authority: &Signer<'_> = &ctx.accounts.write_authority;
         let encoded_vaa = VaaAccount::load(&ctx.accounts.encoded_vaa)?; // IMPORTANT: This line checks that the encoded_vaa has ProcessingStatus::Verified. This check is critical otherwise the program could be tricked into accepting unverified VAAs.
-        let treasury: &AccountInfo<'_> = &ctx.accounts.treasury;
         let price_update_account: &mut Account<'_, PriceUpdateV2> =
             &mut ctx.accounts.price_update_account;
 
@@ -250,7 +247,6 @@ pub mod pyth_solana_receiver {
             config,
             payer,
             write_authority,
-            treasury,
             price_update_account,
             &vaa_components,
             encoded_vaa.try_payload()?.as_ref(),
@@ -320,9 +316,6 @@ pub struct PostUpdate<'info> {
     pub encoded_vaa:          AccountInfo<'info>,
     #[account(seeds = [CONFIG_SEED.as_ref()], bump)]
     pub config:               Account<'info, Config>,
-    /// CHECK: This is just a PDA controlled by the program. There is currently no way to withdraw funds from it.
-    #[account(mut, seeds = [TREASURY_SEED.as_ref(), &[params.treasury_id]], bump)]
-    pub treasury:             AccountInfo<'info>,
     /// The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     /// Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
     #[account(mut, constraint = price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority,)]
@@ -342,9 +335,6 @@ pub struct PostUpdateAtomic<'info> {
     pub guardian_set:         AccountInfo<'info>,
     #[account(seeds = [CONFIG_SEED.as_ref()], bump)]
     pub config:               Account<'info, Config>,
-    #[account(mut, seeds = [TREASURY_SEED.as_ref(), &[params.treasury_id]], bump)]
-    /// CHECK: This is just a PDA controlled by the program. There is currently no way to withdraw funds from it.
-    pub treasury:             AccountInfo<'info>,
     /// The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     /// Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
     #[account(mut, constraint = price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority)]
@@ -400,7 +390,6 @@ fn post_price_update_from_vaa<'info>(
     config: &Account<'info, Config>,
     payer: &Signer<'info>,
     write_authority: &Signer<'info>,
-    treasury: &AccountInfo<'info>,
     price_update_account: &mut Account<'_, PriceUpdateV2>,
     vaa_components: &VaaComponents,
     vaa_payload: &[u8],

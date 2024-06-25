@@ -84,7 +84,6 @@ async fn test_post_update() {
                 encoded_vaa_addresses[0],
                 price_update_keypair.pubkey(),
                 merkle_price_updates[0].clone(),
-                DEFAULT_TREASURY_ID,
             ),
             &vec![&poster],
             None,
@@ -120,7 +119,6 @@ async fn test_post_update() {
                 encoded_vaa_addresses[0],
                 price_update_keypair.pubkey(),
                 merkle_price_updates[1].clone(),
-                DEFAULT_TREASURY_ID,
             ),
             &vec![&poster],
             None,
@@ -224,7 +222,6 @@ async fn test_post_update_wrong_encoded_vaa_owner() {
                     Pubkey::new_unique(), // Random pubkey instead of the encoded VAA address
                     price_update_keypair.pubkey(),
                     merkle_price_updates[0].clone(),
-                    get_random_treasury_id()
                 ),
                 &vec![&poster],
                 None,
@@ -278,7 +275,6 @@ async fn test_post_update_wrong_setup() {
                     encoded_vaa_addresses[0],
                     price_update_keypair.pubkey(),
                     merkle_price_updates[0].clone(),
-                    get_random_treasury_id()
                 ),
                 &vec![&poster],
                 None,

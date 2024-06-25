@@ -71,7 +71,6 @@ impl accounts::PostUpdateAtomic {
             config,
             treasury,
             price_update_account,
-            system_program: system_program::ID,
             write_authority,
         }
     }
@@ -93,7 +92,6 @@ impl accounts::PostUpdate {
             config,
             treasury,
             price_update_account,
-            system_program: system_program::ID,
             write_authority,
         }
     }

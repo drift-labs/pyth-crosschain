@@ -123,6 +123,15 @@ pub mod pyth_solana_receiver {
         Ok(())
     }
 
+    pub fn init_price_update(ctx: Context<InitPriceUpdate>) -> Result<()> {
+        let price_update_account: &mut Account<'_, PriceUpdateV2> =
+            &mut ctx.accounts.price_update_account;
+
+        price_update_account.write_authority = ctx.accounts.write_authority.key();
+
+        Ok(())
+    }
+
     /// Post a price update using a VAA and a MerklePriceUpdate.
     /// This function allows you to post a price update in a single transaction.
     /// Compared to `post_update`, it only checks whatever signatures are present in the provided VAA and doesn't fail if the number of signatures is lower than the Wormhole quorum of two thirds of the guardians.
@@ -289,6 +298,19 @@ pub struct AcceptGovernanceAuthorityTransfer<'info> {
 }
 
 #[derive(Accounts)]
+pub struct InitPriceUpdate<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    #[account(seeds = [CONFIG_SEED.as_ref()], bump)]
+    pub config: Account<'info, Config>,
+    #[account(init_if_needed, payer = payer, space = PriceUpdateV2::LEN)]
+    pub price_update_account: Account<'info, PriceUpdateV2>,
+    pub system_program: Program<'info, System>,
+    #[account(mut)]
+    pub write_authority: Signer<'info>,
+}
+
+#[derive(Accounts)]
 #[instruction(params: PostUpdateParams)]
 pub struct PostUpdate<'info> {
     #[account(mut)]
@@ -303,9 +325,8 @@ pub struct PostUpdate<'info> {
     pub treasury:             AccountInfo<'info>,
     /// The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     /// Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
-    #[account(init_if_needed, constraint = price_update_account.write_authority == Pubkey::default() || price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority , payer =payer, space = PriceUpdateV2::LEN)]
+    #[account(mut, constraint = price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority,)]
     pub price_update_account: Account<'info, PriceUpdateV2>,
-    pub system_program:       Program<'info, System>,
     pub write_authority:      Signer<'info>,
 }
 
@@ -326,9 +347,8 @@ pub struct PostUpdateAtomic<'info> {
     pub treasury:             AccountInfo<'info>,
     /// The constraint is such that either the price_update_account is uninitialized or the write_authority is the write_authority.
     /// Pubkey::default() is the SystemProgram on Solana and it can't sign so it's impossible that price_update_account.write_authority == Pubkey::default() once the account is initialized
-    #[account(init_if_needed, constraint = price_update_account.write_authority == Pubkey::default() || price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority, payer = payer, space = PriceUpdateV2::LEN)]
+    #[account(mut, constraint = price_update_account.write_authority == write_authority.key() @ ReceiverError::WrongWriteAuthority)]
     pub price_update_account: Account<'info, PriceUpdateV2>,
-    pub system_program:       Program<'info, System>,
     pub write_authority:      Signer<'info>,
 }
 
@@ -386,27 +406,6 @@ fn post_price_update_from_vaa<'info>(
     vaa_payload: &[u8],
     price_update: &MerklePriceUpdate,
 ) -> Result<()> {
-    let amount_to_pay = if treasury.lamports() == 0 {
-        Rent::get()?
-            .minimum_balance(0)
-            .max(config.single_update_fee_in_lamports)
-    } else {
-        config.single_update_fee_in_lamports
-    }; // First person to use the treasury account has to pay rent
-    if payer.lamports()
-        < Rent::get()?
-            .minimum_balance(payer.data_len())
-            .saturating_add(amount_to_pay)
-    {
-        return err!(ReceiverError::InsufficientFunds);
-    };
-
-    let transfer_instruction = system_instruction::transfer(payer.key, treasury.key, amount_to_pay);
-    anchor_lang::solana_program::program::invoke(
-        &transfer_instruction,
-        &[payer.to_account_info(), treasury.to_account_info()],
-    )?;
-
     let valid_data_source = config.valid_data_sources.iter().any(|x| {
         *x == DataSource {
             chain:   vaa_components.emitter_chain,

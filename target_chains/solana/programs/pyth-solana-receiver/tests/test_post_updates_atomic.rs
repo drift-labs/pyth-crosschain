@@ -10,6 +10,7 @@ use {
     pyth_solana_receiver::{
         error::ReceiverError,
         instruction::PostUpdateAtomic,
+        instruction::InitPriceUpdate,
         sdk::{
             deserialize_accumulator_update_data,
             get_guardian_set_address,
@@ -61,6 +62,19 @@ async fn test_post_update_atomic() {
     let poster = program_simulator.get_funded_keypair().await.unwrap();
     let price_update_keypair = Keypair::new();
 
+    program_simulator
+        .process_ix_with_default_compute_limit(
+            InitPriceUpdate::populate(
+                poster.pubkey(),
+                poster.pubkey(),
+                price_update_keypair.pubkey(),
+            ),
+            &vec![&poster, &price_update_keypair],
+            None,
+        )
+        .await
+        .unwrap();
+
     assert_treasury_balance(&mut program_simulator, 0, DEFAULT_TREASURY_ID).await;
 
     // post one update atomically
@@ -76,18 +90,11 @@ async fn test_post_update_atomic() {
                 merkle_price_updates[0].clone(),
                 DEFAULT_TREASURY_ID,
             ),
-            &vec![&poster, &price_update_keypair],
+            &vec![&poster],
             None,
         )
         .await
         .unwrap();
-
-    assert_treasury_balance(
-        &mut program_simulator,
-        Rent::default().minimum_balance(0),
-        DEFAULT_TREASURY_ID,
-    )
-    .await;
 
     let mut price_update_account = program_simulator
         .get_anchor_account_data::<PriceUpdateV2>(price_update_keypair.pubkey())
@@ -121,19 +128,11 @@ async fn test_post_update_atomic() {
                 merkle_price_updates[1].clone(),
                 DEFAULT_TREASURY_ID,
             ),
-            &vec![&poster, &price_update_keypair],
+            &vec![&poster],
             None,
         )
         .await
         .unwrap();
-
-    assert_treasury_balance(
-        &mut program_simulator,
-        Rent::default().minimum_balance(0) + 1,
-        DEFAULT_TREASURY_ID,
-    )
-    .await;
-    assert_treasury_balance(&mut program_simulator, 0, SECONDARY_TREASURY_ID).await;
 
     price_update_account = program_simulator
         .get_anchor_account_data::<PriceUpdateV2>(price_update_keypair.pubkey())
@@ -167,24 +166,11 @@ async fn test_post_update_atomic() {
                 merkle_price_updates[0].clone(),
                 SECONDARY_TREASURY_ID,
             ),
-            &vec![&poster, &price_update_keypair],
+            &vec![&poster],
             None,
         )
         .await
         .unwrap();
-
-    assert_treasury_balance(
-        &mut program_simulator,
-        Rent::default().minimum_balance(0) + 1,
-        DEFAULT_TREASURY_ID,
-    )
-    .await;
-    assert_treasury_balance(
-        &mut program_simulator,
-        Rent::default().minimum_balance(0),
-        SECONDARY_TREASURY_ID,
-    )
-    .await;
 
     price_update_account = program_simulator
         .get_anchor_account_data::<PriceUpdateV2>(price_update_keypair.pubkey())
@@ -221,6 +207,19 @@ async fn test_post_update_atomic_wrong_vaa() {
     let poster = program_simulator.get_funded_keypair().await.unwrap();
     let price_update_keypair = Keypair::new();
 
+    program_simulator
+        .process_ix_with_default_compute_limit(
+            InitPriceUpdate::populate(
+                poster.pubkey(),
+                poster.pubkey(),
+                price_update_keypair.pubkey(),
+            ),
+            &vec![&poster, &price_update_keypair],
+            None,
+        )
+        .await
+        .unwrap();
+
     let mut vaa_buffer_copy: Vec<u8> = vaa.clone();
     // Mess up with the length of signatures
     vaa_buffer_copy[5] = 255;
@@ -237,7 +236,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -264,7 +263,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -290,7 +289,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -315,7 +314,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -340,7 +339,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -366,7 +365,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -391,7 +390,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -417,7 +416,7 @@ async fn test_post_update_atomic_wrong_vaa() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -443,7 +442,7 @@ async fn test_post_update_atomic_wrong_vaa() {
         program_simulator
             .process_ix_with_default_compute_limit(
                 wrong_instruction,
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -468,6 +467,20 @@ async fn test_post_update_atomic_wrong_setup() {
         governance_authority: _,
     } = setup_pyth_receiver(vec![], WrongSetupOption::GuardianSetWrongIndex).await;
     let poster: Keypair = program_simulator.get_funded_keypair().await.unwrap();
+
+    program_simulator
+        .process_ix_with_default_compute_limit(
+            InitPriceUpdate::populate(
+                poster.pubkey(),
+                poster.pubkey(),
+                price_update_keypair.pubkey(),
+            ),
+            &vec![&poster, &price_update_keypair],
+            None,
+        )
+        .await
+        .unwrap();
+
     assert_eq!(
         program_simulator
             .process_ix_with_default_compute_limit(
@@ -481,7 +494,7 @@ async fn test_post_update_atomic_wrong_setup() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -497,6 +510,20 @@ async fn test_post_update_atomic_wrong_setup() {
         governance_authority: _,
     } = setup_pyth_receiver(vec![], WrongSetupOption::GuardianSetExpired).await;
     let poster = program_simulator.get_funded_keypair().await.unwrap();
+
+    program_simulator
+        .process_ix_with_default_compute_limit(
+            InitPriceUpdate::populate(
+                poster.pubkey(),
+                poster.pubkey(),
+                price_update_keypair.pubkey(),
+            ),
+            &vec![&poster, &price_update_keypair],
+            None,
+        )
+        .await
+        .unwrap();
+
     assert_eq!(
         program_simulator
             .process_ix_with_default_compute_limit(
@@ -510,7 +537,7 @@ async fn test_post_update_atomic_wrong_setup() {
                     merkle_price_updates[0].clone(),
                     DEFAULT_TREASURY_ID
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await

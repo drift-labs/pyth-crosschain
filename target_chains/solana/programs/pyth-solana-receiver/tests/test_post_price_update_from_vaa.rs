@@ -454,7 +454,6 @@ async fn test_post_price_update_from_vaa() {
     ))
     .unwrap();
 
-    // No 
     // assert_eq!(
     //     program_simulator
     //         .process_ix_with_default_compute_limit(

@@ -9,6 +9,7 @@ use {
     pyth_solana_receiver::{
         error::ReceiverError,
         instruction::{
+            InitPriceUpdate,
             PostUpdate,
             ReclaimRent,
         },
@@ -61,6 +62,19 @@ async fn test_post_update() {
     let poster = program_simulator.get_funded_keypair().await.unwrap();
     let price_update_keypair = Keypair::new();
 
+    program_simulator
+        .process_ix_with_default_compute_limit(
+            InitPriceUpdate::populate(
+                poster.pubkey(),
+                poster.pubkey(),
+                price_update_keypair.pubkey(),
+            ),
+            &vec![&poster, &price_update_keypair],
+            None,
+        )
+        .await
+        .unwrap();
+
     // post one update
     program_simulator
         .process_ix_with_default_compute_limit(
@@ -72,18 +86,11 @@ async fn test_post_update() {
                 merkle_price_updates[0].clone(),
                 DEFAULT_TREASURY_ID,
             ),
-            &vec![&poster, &price_update_keypair],
+            &vec![&poster],
             None,
         )
         .await
         .unwrap();
-
-    assert_treasury_balance(
-        &mut program_simulator,
-        Rent::default().minimum_balance(0),
-        DEFAULT_TREASURY_ID,
-    )
-    .await;
 
     let mut price_update_account = program_simulator
         .get_anchor_account_data::<PriceUpdateV2>(price_update_keypair.pubkey())
@@ -115,18 +122,11 @@ async fn test_post_update() {
                 merkle_price_updates[1].clone(),
                 DEFAULT_TREASURY_ID,
             ),
-            &vec![&poster, &price_update_keypair],
+            &vec![&poster],
             None,
         )
         .await
         .unwrap();
-
-    assert_treasury_balance(
-        &mut program_simulator,
-        Rent::default().minimum_balance(0) + 1,
-        DEFAULT_TREASURY_ID,
-    )
-    .await;
 
     price_update_account = program_simulator
         .get_anchor_account_data::<PriceUpdateV2>(price_update_keypair.pubkey())
@@ -201,6 +201,20 @@ async fn test_post_update_wrong_encoded_vaa_owner() {
     let poster = program_simulator.get_funded_keypair().await.unwrap();
     let price_update_keypair = Keypair::new();
 
+
+    program_simulator
+        .process_ix_with_default_compute_limit(
+            InitPriceUpdate::populate(
+                poster.pubkey(),
+                poster.pubkey(),
+                price_update_keypair.pubkey(),
+            ),
+            &vec![&poster, &price_update_keypair],
+            None,
+        )
+        .await
+        .unwrap();
+
     assert_eq!(
         program_simulator
             .process_ix_with_default_compute_limit(
@@ -212,7 +226,7 @@ async fn test_post_update_wrong_encoded_vaa_owner() {
                     merkle_price_updates[0].clone(),
                     get_random_treasury_id()
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await
@@ -242,6 +256,19 @@ async fn test_post_update_wrong_setup() {
     let poster = program_simulator.get_funded_keypair().await.unwrap();
     let price_update_keypair = Keypair::new();
 
+    program_simulator
+        .process_ix_with_default_compute_limit(
+            InitPriceUpdate::populate(
+                poster.pubkey(),
+                poster.pubkey(),
+                price_update_keypair.pubkey(),
+            ),
+            &vec![&poster, &price_update_keypair],
+            None,
+        )
+        .await
+        .unwrap();
+
     assert_eq!(
         program_simulator
             .process_ix_with_default_compute_limit(
@@ -253,7 +280,7 @@ async fn test_post_update_wrong_setup() {
                     merkle_price_updates[0].clone(),
                     get_random_treasury_id()
                 ),
-                &vec![&poster, &price_update_keypair],
+                &vec![&poster],
                 None,
             )
             .await

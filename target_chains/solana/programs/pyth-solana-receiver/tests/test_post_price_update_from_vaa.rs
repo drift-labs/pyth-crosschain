@@ -1,56 +1,30 @@
 use {
     common_test_utils::{
-        assert_treasury_balance,
-        setup_pyth_receiver,
-        ProgramTestFixtures,
-        WrongSetupOption,
+        assert_treasury_balance, setup_pyth_receiver, ProgramTestFixtures, WrongSetupOption,
         DEFAULT_GUARDIAN_SET_INDEX,
     },
     program_simulator::into_transaction_error,
     pyth_solana_receiver::{
         error::ReceiverError,
-        instruction::{
-            InitPriceUpdate,
-            PostUpdateAtomic,
-            SetDataSources,
-            SetFee,
-        },
-        sdk::{
-            deserialize_accumulator_update_data,
-            DEFAULT_TREASURY_ID,
-        },
+        instruction::{InitPriceUpdate, PostUpdateAtomic, SetDataSources, SetFee},
+        sdk::{deserialize_accumulator_update_data, DEFAULT_TREASURY_ID},
     },
     pyth_solana_receiver_sdk::{
         config::DataSource,
-        price_update::{
-            PriceUpdateV2,
-            VerificationLevel,
-        },
+        price_update::{PriceUpdateV2, VerificationLevel},
     },
     pythnet_sdk::{
         messages::Message,
         test_utils::{
-            create_accumulator_message,
-            create_dummy_price_feed_message,
-            create_dummy_twap_message,
-            trim_vaa_signatures,
-            DEFAULT_DATA_SOURCE,
-            SECONDARY_DATA_SOURCE,
+            create_accumulator_message, create_dummy_price_feed_message, create_dummy_twap_message,
+            trim_vaa_signatures, DEFAULT_DATA_SOURCE, SECONDARY_DATA_SOURCE,
         },
     },
-    solana_program::{
-        native_token::LAMPORTS_PER_SOL,
-        pubkey::Pubkey,
-        pubkey,
-    },
-    solana_sdk::{
-        rent::Rent,
-        signature::Keypair,
-        signer::Signer,
-    },
+    solana_program::{native_token::LAMPORTS_PER_SOL, pubkey, pubkey::Pubkey},
+    solana_sdk::{rent::Rent, signature::Keypair, signer::Signer},
 };
 
-pub const BRIDGE_ID : Pubkey = pubkey!("HDwcJBJXjL9FpJ7UBsYBtaDjsBUhuLCUYoz3zr8SWWaQ");
+pub const BRIDGE_ID: Pubkey = pubkey!("HDwcJBJXjL9FpJ7UBsYBtaDjsBUhuLCUYoz3zr8SWWaQ");
 
 // This file is meant to test the errors that can be thrown by post_price_update_from_vaa
 #[tokio::test]
@@ -118,7 +92,6 @@ async fn test_invalid_update_message() {
     let message = create_accumulator_message(&[feed_1, feed_2], &[feed_1, feed_2], false, true);
     let (vaa, merkle_price_updates) = deserialize_accumulator_update_data(message).unwrap();
 
-
     let ProgramTestFixtures {
         mut program_simulator,
         encoded_vaa_addresses: _,
@@ -167,7 +140,6 @@ async fn test_invalid_update_message() {
         into_transaction_error(ReceiverError::DeserializeMessageFailed)
     );
 }
-
 
 #[tokio::test]
 async fn test_post_price_update_from_vaa() {
@@ -263,14 +235,13 @@ async fn test_post_price_update_from_vaa() {
         into_transaction_error(ReceiverError::UnsupportedMessageType)
     );
 
-
     // change the data source
     program_simulator
         .process_ix_with_default_compute_limit(
             SetDataSources::populate(
                 governance_authority.pubkey(),
                 vec![DataSource {
-                    chain:   SECONDARY_DATA_SOURCE.chain.into(),
+                    chain: SECONDARY_DATA_SOURCE.chain.into(),
                     emitter: Pubkey::from(DEFAULT_DATA_SOURCE.address.0),
                 }],
             ),
@@ -308,7 +279,7 @@ async fn test_post_price_update_from_vaa() {
             SetDataSources::populate(
                 governance_authority.pubkey(),
                 vec![DataSource {
-                    chain:   DEFAULT_DATA_SOURCE.chain.into(),
+                    chain: DEFAULT_DATA_SOURCE.chain.into(),
                     emitter: Pubkey::from(SECONDARY_DATA_SOURCE.address.0),
                 }],
             ),
@@ -317,7 +288,6 @@ async fn test_post_price_update_from_vaa() {
         )
         .await
         .unwrap();
-
 
     // assert_eq!(
     //     program_simulator
@@ -346,7 +316,7 @@ async fn test_post_price_update_from_vaa() {
             SetDataSources::populate(
                 governance_authority.pubkey(),
                 vec![DataSource {
-                    chain:   DEFAULT_DATA_SOURCE.chain.into(),
+                    chain: DEFAULT_DATA_SOURCE.chain.into(),
                     emitter: Pubkey::from(DEFAULT_DATA_SOURCE.address.0),
                 }],
             ),
@@ -430,7 +400,6 @@ async fn test_post_price_update_from_vaa() {
         program_simulator.get_clock().await.unwrap().slot
     );
 
-
     // Now change the fee!
     program_simulator
         .process_ix_with_default_compute_limit(
@@ -488,7 +457,6 @@ async fn test_post_price_update_from_vaa() {
         price_update_account.posted_slot,
         program_simulator.get_clock().await.unwrap().slot
     );
-
 
     // Airdrop more
     program_simulator

@@ -1,49 +1,32 @@
 use {
     common_test_utils::{
-        assert_treasury_balance,
-        setup_pyth_receiver,
-        ProgramTestFixtures,
-        WrongSetupOption,
+        assert_treasury_balance, setup_pyth_receiver, ProgramTestFixtures, WrongSetupOption,
         DEFAULT_GUARDIAN_SET_INDEX,
     },
     program_simulator::into_transaction_error,
     pyth_solana_receiver::{
         error::ReceiverError,
-        instruction::PostUpdateAtomic,
         instruction::InitPriceUpdate,
+        instruction::PostUpdateAtomic,
         sdk::{
-            deserialize_accumulator_update_data,
-            get_guardian_set_address,
-            DEFAULT_TREASURY_ID,
+            deserialize_accumulator_update_data, get_guardian_set_address, DEFAULT_TREASURY_ID,
             SECONDARY_TREASURY_ID,
         },
     },
-    pyth_solana_receiver_sdk::price_update::{
-        PriceUpdateV2,
-        VerificationLevel,
-    },
+    pyth_solana_receiver_sdk::price_update::{PriceUpdateV2, VerificationLevel},
     pythnet_sdk::{
         messages::Message,
         test_utils::{
-            create_accumulator_message,
-            create_dummy_price_feed_message,
-            trim_vaa_signatures,
+            create_accumulator_message, create_dummy_price_feed_message, trim_vaa_signatures,
         },
     },
     serde_wormhole::RawMessage,
-    solana_program::{
-        pubkey,
-        pubkey::Pubkey
-    },
-    solana_sdk::{
-        rent::Rent,
-        signature::Keypair,
-        signer::Signer,
-    },
+    solana_program::{pubkey, pubkey::Pubkey},
+    solana_sdk::{rent::Rent, signature::Keypair, signer::Signer},
     wormhole_sdk::Vaa,
 };
 
-pub const BRIDGE_ID : Pubkey = pubkey!("HDwcJBJXjL9FpJ7UBsYBtaDjsBUhuLCUYoz3zr8SWWaQ");
+pub const BRIDGE_ID: Pubkey = pubkey!("HDwcJBJXjL9FpJ7UBsYBtaDjsBUhuLCUYoz3zr8SWWaQ");
 
 #[tokio::test]
 async fn test_post_update_atomic() {
@@ -271,7 +254,6 @@ async fn test_post_update_atomic_wrong_vaa() {
     //     into_transaction_error(ReceiverError::InsufficientGuardianSignatures)
     // );
 
-
     let mut vaa_copy: Vaa<&RawMessage> = serde_wormhole::from_slice(&vaa).unwrap();
     vaa_copy.version = 0;
 
@@ -344,7 +326,6 @@ async fn test_post_update_atomic_wrong_vaa() {
         into_transaction_error(ReceiverError::InvalidGuardianOrder)
     );
 
-
     let mut vaa_copy: Vaa<&RawMessage> = serde_wormhole::from_slice(&vaa).unwrap();
     vaa_copy.signatures[0].index = 20;
 
@@ -393,7 +374,6 @@ async fn test_post_update_atomic_wrong_vaa() {
         into_transaction_error(ReceiverError::InvalidSignature)
     );
 
-
     let mut vaa_copy: Vaa<&RawMessage> = serde_wormhole::from_slice(&vaa).unwrap();
     vaa_copy.signatures[0].signature = vaa_copy.signatures[1].signature;
 
@@ -432,18 +412,13 @@ async fn test_post_update_atomic_wrong_vaa() {
     wrong_instruction.accounts[1].pubkey = wrong_guardian_set;
     assert_eq!(
         program_simulator
-            .process_ix_with_default_compute_limit(
-                wrong_instruction,
-                &vec![&poster],
-                None,
-            )
+            .process_ix_with_default_compute_limit(wrong_instruction, &vec![&poster], None,)
             .await
             .unwrap_err()
             .unwrap(),
         into_transaction_error(ReceiverError::WrongGuardianSetOwner)
     );
 }
-
 
 #[tokio::test]
 async fn test_post_update_atomic_wrong_setup() {
@@ -493,7 +468,6 @@ async fn test_post_update_atomic_wrong_setup() {
             .unwrap(),
         into_transaction_error(ReceiverError::InvalidGuardianSetPda)
     );
-
 
     let ProgramTestFixtures {
         mut program_simulator,

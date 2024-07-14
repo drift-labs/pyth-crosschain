@@ -1,31 +1,12 @@
 use {
-    crate::{
-        accounts,
-        instruction,
-        ID,
-    },
-    anchor_lang::{
-        prelude::*,
-        system_program,
-        InstructionData,
-    },
+    crate::{accounts, instruction, ID},
+    anchor_lang::{prelude::*, system_program, InstructionData},
     pyth_solana_receiver_sdk::{
-        config::{
-            Config,
-            DataSource,
-        },
-        pda::{
-            get_config_address,
-            get_treasury_address,
-        },
-        PostUpdateAtomicParams,
-        PostUpdateParams,
+        config::{Config, DataSource},
+        pda::{get_config_address, get_treasury_address},
+        PostUpdateAtomicParams, PostUpdateParams,
     },
-    pythnet_sdk::wire::v1::{
-        AccumulatorUpdateData,
-        MerklePriceUpdate,
-        Proof,
-    },
+    pythnet_sdk::wire::v1::{AccumulatorUpdateData, MerklePriceUpdate, Proof},
     rand::Rng,
     solana_program::instruction::Instruction,
     wormhole_core_bridge_solana::state::GuardianSet,
@@ -52,11 +33,7 @@ impl accounts::Initialize {
 }
 
 impl accounts::InitPriceUpdate {
-    pub fn populate(
-        payer: Pubkey,
-        write_authority: Pubkey,
-        price_update_account: Pubkey,
-    ) -> Self {
+    pub fn populate(payer: Pubkey, write_authority: Pubkey, price_update_account: Pubkey) -> Self {
         accounts::InitPriceUpdate {
             payer,
             price_update_account,
@@ -66,7 +43,6 @@ impl accounts::InitPriceUpdate {
     }
 }
 
-
 impl accounts::PostUpdateAtomic {
     pub fn populate(
         payer: Pubkey,
@@ -75,7 +51,6 @@ impl accounts::PostUpdateAtomic {
         wormhole_address: Pubkey,
         guardian_set_index: u32,
     ) -> Self {
-
         let guardian_set = get_guardian_set_address(wormhole_address, guardian_set_index);
 
         accounts::PostUpdateAtomic {
@@ -131,8 +106,8 @@ impl instruction::Initialize {
     pub fn populate(payer: &Pubkey, initial_config: Config) -> Instruction {
         Instruction {
             program_id: ID,
-            accounts:   accounts::Initialize::populate(payer).to_account_metas(None),
-            data:       instruction::Initialize { initial_config }.data(),
+            accounts: accounts::Initialize::populate(payer).to_account_metas(None),
+            data: instruction::Initialize { initial_config }.data(),
         }
     }
 }
@@ -143,18 +118,13 @@ impl instruction::InitPriceUpdate {
         write_authority: Pubkey,
         price_update_account: Pubkey,
     ) -> Instruction {
-        let post_update_accounts = accounts::InitPriceUpdate::populate(
-            payer,
-            write_authority,
-            price_update_account,
-        )
-            .to_account_metas(None);
+        let post_update_accounts =
+            accounts::InitPriceUpdate::populate(payer, write_authority, price_update_account)
+                .to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   post_update_accounts,
-            data:       instruction::InitPriceUpdate {
-            }
-                .data(),
+            accounts: post_update_accounts,
+            data: instruction::InitPriceUpdate {}.data(),
         }
     }
 }
@@ -176,8 +146,8 @@ impl instruction::PostUpdate {
         .to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   post_update_accounts,
-            data:       instruction::PostUpdate {
+            accounts: post_update_accounts,
+            data: instruction::PostUpdate {
                 params: PostUpdateParams {
                     merkle_price_update,
                 },
@@ -186,7 +156,6 @@ impl instruction::PostUpdate {
         }
     }
 }
-
 
 impl instruction::PostUpdateAtomic {
     pub fn populate(
@@ -208,8 +177,8 @@ impl instruction::PostUpdateAtomic {
         .to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   post_update_accounts,
-            data:       instruction::PostUpdateAtomic {
+            accounts: post_update_accounts,
+            data: instruction::PostUpdateAtomic {
                 params: PostUpdateAtomicParams {
                     vaa,
                     merkle_price_update,
@@ -220,14 +189,13 @@ impl instruction::PostUpdateAtomic {
     }
 }
 
-
 impl instruction::SetDataSources {
     pub fn populate(payer: Pubkey, data_sources: Vec<DataSource>) -> Instruction {
         let governance_accounts = accounts::Governance::populate(payer).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::SetDataSources {
+            accounts: governance_accounts,
+            data: instruction::SetDataSources {
                 valid_data_sources: data_sources,
             }
             .data(),
@@ -240,8 +208,8 @@ impl instruction::SetFee {
         let governance_accounts = accounts::Governance::populate(payer).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::SetFee {
+            accounts: governance_accounts,
+            data: instruction::SetFee {
                 single_update_fee_in_lamports: fee,
             }
             .data(),
@@ -249,26 +217,24 @@ impl instruction::SetFee {
     }
 }
 
-
 impl instruction::SetWormholeAddress {
     pub fn populate(payer: Pubkey, wormhole: Pubkey) -> Instruction {
         let governance_accounts = accounts::Governance::populate(payer).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::SetWormholeAddress { wormhole }.data(),
+            accounts: governance_accounts,
+            data: instruction::SetWormholeAddress { wormhole }.data(),
         }
     }
 }
-
 
 impl instruction::SetMinimumSignatures {
     pub fn populate(payer: Pubkey, minimum_signatures: u8) -> Instruction {
         let governance_accounts = accounts::Governance::populate(payer).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::SetMinimumSignatures { minimum_signatures }.data(),
+            accounts: governance_accounts,
+            data: instruction::SetMinimumSignatures { minimum_signatures }.data(),
         }
     }
 }
@@ -278,8 +244,8 @@ impl instruction::RequestGovernanceAuthorityTransfer {
         let governance_accounts = accounts::Governance::populate(payer).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::RequestGovernanceAuthorityTransfer {
+            accounts: governance_accounts,
+            data: instruction::RequestGovernanceAuthorityTransfer {
                 target_governance_authority,
             }
             .data(),
@@ -292,8 +258,8 @@ impl instruction::CancelGovernanceAuthorityTransfer {
         let governance_accounts = accounts::Governance::populate(payer).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::CancelGovernanceAuthorityTransfer.data(),
+            accounts: governance_accounts,
+            data: instruction::CancelGovernanceAuthorityTransfer.data(),
         }
     }
 }
@@ -304,8 +270,8 @@ impl instruction::AcceptGovernanceAuthorityTransfer {
             accounts::AcceptGovernanceAuthorityTransfer::populate(payer).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::AcceptGovernanceAuthorityTransfer {}.data(),
+            accounts: governance_accounts,
+            data: instruction::AcceptGovernanceAuthorityTransfer {}.data(),
         }
     }
 }
@@ -316,8 +282,8 @@ impl instruction::ReclaimRent {
             accounts::ReclaimRent::populate(payer, price_update_account).to_account_metas(None);
         Instruction {
             program_id: ID,
-            accounts:   governance_accounts,
-            data:       instruction::ReclaimRent {}.data(),
+            accounts: governance_accounts,
+            data: instruction::ReclaimRent {}.data(),
         }
     }
 }

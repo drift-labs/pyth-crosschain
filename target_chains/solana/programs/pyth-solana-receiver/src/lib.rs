@@ -1,8 +1,7 @@
 pub use pythnet_sdk::wire::v1::MerklePriceUpdate;
 use {
     crate::error::ReceiverError,
-    anchor_lang::prelude::*,
-    anchor_lang::solana_program::program_pack::Pack,
+    anchor_lang::{prelude::*, solana_program::program_pack::Pack},
     pyth_solana_receiver_sdk::{
         config::{Config, DataSource},
         pda::{CONFIG_SEED, TREASURY_SEED},
@@ -45,9 +44,7 @@ pub const VALID_DATA_SOURCES: [DataSource; 1] = [DataSource {
 
 #[program]
 pub mod pyth_solana_receiver {
-    use anchor_lang::accounts::account_info;
-
-    use super::*;
+    use {super::*, anchor_lang::accounts::account_info};
 
     pub fn initialize(ctx: Context<Initialize>, initial_config: Config) -> Result<()> {
         require!(

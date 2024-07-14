@@ -6,8 +6,7 @@ use {
     program_simulator::into_transaction_error,
     pyth_solana_receiver::{
         error::ReceiverError,
-        instruction::InitPriceUpdate,
-        instruction::PostUpdateAtomic,
+        instruction::{InitPriceUpdate, PostUpdateAtomic},
         sdk::{
             deserialize_accumulator_update_data, get_guardian_set_address, DEFAULT_TREASURY_ID,
             SECONDARY_TREASURY_ID,

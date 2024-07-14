@@ -20,7 +20,10 @@ use {
             trim_vaa_signatures, DEFAULT_DATA_SOURCE, SECONDARY_DATA_SOURCE,
         },
     },
-    solana_program::{native_token::LAMPORTS_PER_SOL, pubkey, pubkey::Pubkey},
+    solana_program::{
+        native_token::LAMPORTS_PER_SOL,
+        pubkey::{self, Pubkey},
+    },
     solana_sdk::{rent::Rent, signature::Keypair, signer::Signer},
 };
 

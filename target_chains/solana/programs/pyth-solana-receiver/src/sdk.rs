@@ -3,8 +3,9 @@ use {
     anchor_lang::{prelude::*, system_program, InstructionData},
     pyth_solana_receiver_sdk::{
         config::{Config, DataSource},
+        cpi::accounts,
         pda::{get_config_address, get_treasury_address},
-        PostUpdateAtomicParams, PostUpdateParams,
+        PostMultiUpdatesAtomicParams, PostUpdateAtomicParams, PostUpdateParams,
     },
     pythnet_sdk::wire::v1::{AccumulatorUpdateData, MerklePriceUpdate, Proof},
     rand::Rng,
@@ -57,6 +58,23 @@ impl accounts::PostUpdateAtomic {
             payer,
             guardian_set,
             price_update_account,
+            write_authority,
+        }
+    }
+}
+
+impl accounts::PostMultiUpdatesAtomic {
+    pub fn populate(
+        payer: Pubkey,
+        write_authority: Pubkey,
+        wormhole_address: Pubkey,
+        guardian_set_index: u32,
+    ) -> Self {
+        let guardian_set = get_guardian_set_address(wormhole_address, guardian_set_index);
+
+        accounts::PostMultiUpdatesAtomic {
+            payer,
+            guardian_set,
             write_authority,
         }
     }
@@ -182,6 +200,36 @@ impl instruction::PostUpdateAtomic {
                 params: PostUpdateAtomicParams {
                     vaa,
                     merkle_price_update,
+                },
+            }
+            .data(),
+        }
+    }
+}
+
+impl instruction::PostMultiUpdatesAtomic {
+    pub fn populate(
+        payer: Pubkey,
+        write_authority: Pubkey,
+        wormhole_address: Pubkey,
+        guardian_set_index: u32,
+        vaa: Vec<u8>,
+        merkle_price_updates: Vec<MerklePriceUpdate>,
+    ) -> Instruction {
+        let post_update_accounts = accounts::PostMultiUpdatesAtomic::populate(
+            payer,
+            write_authority,
+            wormhole_address,
+            guardian_set_index,
+        )
+        .to_account_metas(None);
+        Instruction {
+            program_id: ID,
+            accounts: post_update_accounts,
+            data: instruction::PostMultiUpdatesAtomic {
+                params: PostMultiUpdatesAtomicParams {
+                    vaa,
+                    merkle_price_updates,
                 },
             }
             .data(),

@@ -213,7 +213,7 @@ pub mod pyth_solana_receiver {
 
     /// Post multiple price updates using a single and multiple merkle price updates.
     /// Meant to be similar to post_update_atomic but re-using the vaa for multiple updates so we can save space
-    pub fn post_mulit_updates_atomic(
+    pub fn post_multi_updates_atomic(
         ctx: Context<PostMultiUpdatesAtomic>,
         params: PostMultiUpdatesAtomicParams,
     ) -> Result<()> {

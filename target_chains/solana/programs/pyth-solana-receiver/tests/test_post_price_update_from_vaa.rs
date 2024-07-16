@@ -40,10 +40,8 @@ use {
     },
     solana_program::{
         native_token::LAMPORTS_PER_SOL,
-        pubkey::{
-            self,
-            Pubkey,
-        },
+        pubkey,
+        pubkey::Pubkey,
     },
     solana_sdk::{
         rent::Rent,

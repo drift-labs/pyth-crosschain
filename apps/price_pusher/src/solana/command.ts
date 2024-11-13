@@ -18,7 +18,7 @@ import {
   searcherClient,
 } from "jito-ts/dist/sdk/block-engine/searcher";
 import express from 'express';
-import { AverageOverSlotsStrategy, DriftClient, PriorityFeeMethod, PriorityFeeSubscriber, WhileValidTxSender } from "@drift-labs/sdk";
+import { AverageOverSlotsStrategy, BulkAccountLoader, DriftClient, PriorityFeeMethod, PriorityFeeSubscriber, WhileValidTxSender } from "@drift-labs/sdk";
 
 export default {
   command: "solana",
@@ -125,8 +125,17 @@ export default {
           skipPreflight: true
         },
         trackTxLandRate: true
-      })
+      }),
+      accountSubscription: {
+        type: 'polling',
+        accountLoader: new BulkAccountLoader(
+          connection,
+          'processed',
+          0,
+        )
+      }
     });
+    await driftClient.subscribe();
 
     let solanaPricePusher;
     if (jitoTipLamports) {
@@ -150,12 +159,10 @@ export default {
         connection: driftClient.connection,
         frequencyMs: 5000,
         customStrategy: new AverageOverSlotsStrategy(),
-        // the specific bot will update this, if multiple bots are using this,
-        // the last one to update it will determine the addresses to use...
-        addresses: [],
+        addresses: driftClient.getSpotMarketAccounts().map((account) => account.oracle),
         priorityFeeMethod: PriorityFeeMethod.SOLANA,
         maxFeeMicroLamports: 30000000,
-        priorityFeeMultiplier: 1.0,
+        priorityFeeMultiplier: 1.25,
       });
       await priorityFeeSubscriber.subscribe();
       solanaPricePusher = new SolanaPricePusher(

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { PythSolanaReceiverProgram } from "@pythnetwork/pyth-solana-receiver";
 import {
   ChainPriceListener,
@@ -13,7 +14,7 @@ import {
 } from "@pythnetwork/solana-utils";
 import { AddressLookupTableAccount, ComputeBudgetProgram, Connection, PublicKey, TransactionError, TransactionInstruction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
 import { DriftClient, getPythPullOraclePublicKey, isSetComputeUnitsIx, PriorityFeeSubscriber, TxSigAndSlot } from "@drift-labs/sdk";
-import { getFeedIdUint8Array } from "@drift-labs/sdk/lib/util/pythPullOracleUtils"
+import { getFeedIdUint8Array } from "@drift-labs/sdk";
 import { PriceUpdateAccount } from "@pythnetwork/pyth-solana-receiver/lib/PythSolanaReceiver";
 import { Program } from "@coral-xyz/anchor";
 import { base64 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";

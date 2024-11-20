@@ -56,3 +56,13 @@ export const mnemonicFile = {
     required: true,
   } as Options,
 };
+
+export const additionalSendEndpoints = {
+  "additional-send-endpoints": {
+    description:
+      "Additional send endpoints. " +
+      "If you want to send the price to multiple RPCs, you can specify multiple endpoints.",
+    type: "string",
+    required: false,
+  } as Options,
+};

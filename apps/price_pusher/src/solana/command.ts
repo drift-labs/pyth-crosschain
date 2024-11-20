@@ -65,6 +65,11 @@ export default {
       type: "string",
       optional: false,
     } as Options,
+    "additional-send-endpoints": {
+      description: "Additional send endpoints separated by comma",
+      type: "string",
+      optional: true,
+    } as Options,
     ...options.priceConfigFile,
     ...options.priceServiceEndpoint,
     ...options.pollingFrequency,
@@ -82,7 +87,8 @@ export default {
       jitoKeypairFile,
       jitoTipLamports,
       jitoBundleSize,
-      addressLookupTablePubkey
+      addressLookupTablePubkey,
+      additionalSendEndpoints,
     } = argv;
 
     const priceConfigs = readPriceConfigFile(priceConfigFile);
@@ -112,6 +118,14 @@ export default {
       loadKeypair(fs.readFileSync(keypairFile, "ascii"))
     );
 
+    const additionalConnections: Connection[] = [];
+    if (additionalSendEndpoints) {
+      const additionalEndpointsSeparated = additionalSendEndpoints.split(",").map((endpoint: string) => endpoint.trim());
+      for (const endpoint of additionalEndpointsSeparated) {
+        additionalConnections.push(new Connection(endpoint, "processed"));
+      }
+    }
+
     const connection = new Connection(endpoint, "processed");
     const driftClient = new DriftClient({
       connection,
@@ -124,6 +138,7 @@ export default {
           maxRetries: 0,
           skipPreflight: true
         },
+        additionalConnections,
         trackTxLandRate: true
       }),
       accountSubscription: {

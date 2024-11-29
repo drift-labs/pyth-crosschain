@@ -9,6 +9,6 @@ pyth-lazer-solana-contract = { path = "../../contracts/solana/programs/pyth-laze
 
 solana-program = "1.16"
 bytemuck = { version = "1.18.0", features = ["derive"] }
-byteorder = "1.5.0"
+byteorder = "1.4.3"
 thiserror = "1.0.64"
 anchor-lang = "0.29.0"

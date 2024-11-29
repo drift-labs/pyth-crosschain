@@ -1,18 +1,11 @@
 packages:
   - "apps/price_pusher"
   - "apps/hermes/client/js"
-  - "governance/xc_admin/packages/*"
-  - "governance/multisig_wh_message_builder"
   - "price_service/sdk/js"
   - "price_service/client/js"
   - "pythnet/message_buffer"
   - "target_chains/solana/sdk/js/solana_utils"
   - "target_chains/solana/sdk/js/pyth_solana_receiver"
-  - "target_chains/ton/contracts"
-  - "target_chains/ton/sdk/js"
-  - "contract_manager"
-  - "lazer/contracts/solana"
-  - "lazer/sdk/js"
 
 catalog:
   "@amplitude/analytics-browser": 2.11.8

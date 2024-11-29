@@ -11,14 +11,5 @@
   "engines": {
     "node": ">=18.0.0 <19.0.0"
   },
-  "version": "0.0.1",
-  "pnpm": {
-    "overrides": {
-      "@injectivelabs/sdk-ts@1.10.72>@injectivelabs/token-metadata": "1.10.42",
-      "eslint-config-next>@typescript-eslint/parser": "^7.0.0"
-    },
-    "patchedDependencies": {
-      "eccrypto@1.1.6": "patches/eccrypto@1.1.6.patch"
-    }
-  }
+  "version": "0.0.1"
 }

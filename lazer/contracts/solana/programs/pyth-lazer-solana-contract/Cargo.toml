@@ -1,8 +1,10 @@
 [package]
 name = "pyth-lazer-solana-contract"
-version = "0.1.0"
-description = "Created with Anchor"
+version = "0.2.0"
 edition = "2021"
+description = "Pyth Lazer Solana contract and SDK."
+license = "Apache-2.0"
+repository = "https://github.com/pyth-network/pyth-crosschain"
 
 [lib]
 crate-type = ["cdylib", "lib"]
@@ -17,4 +19,16 @@ no-log-ix-name = []
 idl-build = ["anchor-lang/idl-build"]
 
 [dependencies]
+pyth-lazer-protocol = { version = "0.1.2", path = "../../../../sdk/rust/protocol" }
+
 anchor-lang = "0.29.0"
+bytemuck = "1.4.0"
+byteorder = "1.4.3"
+thiserror = "1.0"
+solana-program = "1.16"
+
+[dev-dependencies]
+hex = "0.4.3"
+solana-program-test = "1.18.26"
+solana-sdk = "1.18.26"
+tokio = { version = "1.40.0", features = ["full"] }

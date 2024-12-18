@@ -6,8 +6,6 @@ packages:
   - "pythnet/message_buffer"
   - "target_chains/solana/sdk/js/solana_utils"
   - "target_chains/solana/sdk/js/pyth_solana_receiver"
-  - "lazer/contracts/solana"
-  - "lazer/sdk/js"
 
 catalog:
   "@amplitude/analytics-browser": 2.11.8

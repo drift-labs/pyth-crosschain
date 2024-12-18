@@ -1,5 +1,4 @@
 {
-  "name": "@pythnetwork/pyth-lazer-solana-contract",
   "license": "ISC",
   "scripts": {
     "fix:format": "prettier --write **/*.*",

@@ -2,9 +2,6 @@
 name = "pyth-lazer-protocol"
 version = "0.1.0"
 edition = "2021"
-description = "Pyth Lazer SDK - protocol types."
-license = "Apache-2.0"
-repository = "https://github.com/pyth-network/pyth-crosschain"
 
 [dependencies]
 byteorder = "1.4.3"

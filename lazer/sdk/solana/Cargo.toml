@@ -2,13 +2,10 @@
 name = "pyth-lazer-sdk"
 version = "0.1.0"
 edition = "2021"
-description = "Pyth Lazer SDK"
-license = "Apache-2.0"
-repository = "https://github.com/pyth-network/pyth-crosschain"
 
 [dependencies]
-pyth-lazer-protocol = { version = "0.1.0", path = "../rust/protocol" }
-pyth-lazer-solana-contract = { version = "0.1.0", path = "../../contracts/solana/programs/pyth-lazer-solana-contract", features = ["no-entrypoint"] }
+pyth-lazer-protocol = { path = "../rust/protocol" }
+pyth-lazer-solana-contract = { path = "../../contracts/solana/programs/pyth-lazer-solana-contract", features = ["no-entrypoint"] }
 
 solana-program = "1.16"
 bytemuck = { version = "1.4.0", features = ["derive"] }

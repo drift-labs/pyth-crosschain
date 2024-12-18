@@ -224,6 +224,28 @@ pub mod pyth_lazer_solana_contract {
     }
 }
 
+pub fn verify_message_direct<'a>(
+    pyth_storage_account: &Storage,
+    instruction_sysvar: &AccountInfo,
+    message_data: &'a [u8],
+    ed25519_instruction_index: u16,
+    signature_index: u8,
+    message_offset: u16,
+) -> Result<VerifiedMessage> {
+    signature::verify_message(
+        pyth_storage_account,
+        instruction_sysvar,
+        &message_data,
+        ed25519_instruction_index,
+        signature_index,
+        message_offset,
+    )
+    .map_err(|err| {
+        msg!("signature verification error: {:?}", err);
+        err.into()
+    })
+}
+
 #[derive(Accounts)]
 pub struct Initialize<'info> {
     #[account(mut)]

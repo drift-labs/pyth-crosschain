@@ -162,7 +162,7 @@ pub fn verify_message<'a>(
     signature_index: u8,
     message_offset: u16,
 ) -> Result<VerifiedMessage<'a>, SignatureVerificationError> {
-    if pyth_storage_account.key != &pyth_lazer_solana_contract::storage::ID {
+    if pyth_storage_account.key != &pyth_lazer_solana_contract::STORAGE_ID {
         return Err(SignatureVerificationError::InvalidStorageAccountId);
     }
     let storage = {

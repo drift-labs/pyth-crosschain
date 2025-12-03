@@ -111,6 +111,12 @@ pub mod v1 {
         pub proof:   MerklePath<Keccak160>,
     }
 
+    // placeholder implementation for `anchor build` IDL to compile
+    // its ok because this type and its constituents are not used within the drift IDL
+    #[cfg(feature = "idl-build")]
+    impl anchor_lang::IdlBuild for MerklePriceUpdate {
+    }
+
     #[derive(Clone, Debug, Hash, PartialEq, Serialize, Deserialize)]
     pub struct WormholeMessage {
         pub magic:   [u8; 4],

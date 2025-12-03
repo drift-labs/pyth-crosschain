@@ -41,6 +41,10 @@ use {
         thread_rng,
     },
     serde_wormhole::RawMessage,
+    solana_program::{
+        pubkey,
+        pubkey::Pubkey,
+    },
     wormhole_sdk::{
         vaa::{
             Body,
@@ -50,7 +54,6 @@ use {
         Chain,
         Vaa,
     },
-    solana_program::{pubkey, pubkey::Pubkey}
 };
 
 pub struct DataSource {
@@ -59,8 +62,11 @@ pub struct DataSource {
 }
 
 pub const DEFAULT_DATA_SOURCE: DataSource = DataSource {
-    address: Address([225, 1, 250, 237, 172, 88, 81, 227, 43, 155, 35, 181, 249, 65, 26, 140, 43, 172, 74, 174, 62, 212, 221, 123, 129, 29, 209, 167, 46, 164, 170, 113]),
-    chain: Chain::Pythnet,
+    address: Address([
+        225, 1, 250, 237, 172, 88, 81, 227, 43, 155, 35, 181, 249, 65, 26, 140, 43, 172, 74, 174,
+        62, 212, 221, 123, 129, 29, 209, 167, 46, 164, 170, 113,
+    ]),
+    chain:   Chain::Pythnet,
 };
 
 pub const DEFAULT_GOVERNANCE_SOURCE: DataSource = DataSource {

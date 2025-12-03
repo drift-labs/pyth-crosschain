@@ -2,13 +2,11 @@ use {
     crate::Storage,
     anchor_lang::{
         prelude::{borsh, AccountInfo, Clock, ProgramError, Pubkey, SolanaSysvar},
-        solana_program::{
-            ed25519_program, program_memory::sol_memcmp, pubkey::PUBKEY_BYTES, sysvar,
-        },
         AnchorDeserialize, AnchorSerialize,
     },
     bytemuck::{cast_slice, checked::try_cast_slice, Pod, Zeroable},
     byteorder::{ByteOrder, LE},
+    solana_program::{ed25519_program, program_memory::sol_memcmp, pubkey::PUBKEY_BYTES, sysvar},
     thiserror::Error,
 };
 

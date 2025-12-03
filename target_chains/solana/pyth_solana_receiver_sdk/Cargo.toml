@@ -11,8 +11,11 @@ edition = "2021"
 crate-type = ["lib"]
 name = "pyth_solana_receiver_sdk"
 
+[features]
+idl-build = ["anchor-lang/idl-build"]
+
 [dependencies]
-anchor-lang = ">=0.28.0"
+anchor-lang = "0.32.1"
 hex = ">=0.4.3"
 pythnet-sdk = { path = "../../../pythnet/pythnet_sdk", version = "2.1.0", features = ["solana-program"]}
-solana-program = ">=1.16.0"
+solana-program = "2.2"

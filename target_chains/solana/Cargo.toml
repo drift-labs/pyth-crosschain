@@ -6,6 +6,7 @@ members = [
     "pyth_solana_receiver_sdk/",
     "common_test_utils",
 ]
+resolver = "2"
 
 [profile.release]
 overflow-checks = true

@@ -90,7 +90,7 @@ pub type FeedId = [u8; 32];
 )]
 
 pub struct PriceFeedMessage {
-    pub feed_id:           FeedId,
+    pub feed_id:           [u8; 32],
     pub price:             i64,
     pub conf:              u64,
     pub exponent:          i32,

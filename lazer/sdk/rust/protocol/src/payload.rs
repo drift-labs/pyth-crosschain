@@ -35,6 +35,14 @@ pub enum PayloadPropertyValue {
     BestAskPrice(Option<Price>),
     PublisherCount(Option<u16>),
     Exponent(i16),
+    Confidence(Option<Price>),
+    FundingRate(Option<Rate>),
+    FundingTimestamp(Option<TimestampUs>),
+    FundingRateInterval(Option<DurationUs>),
+    MarketSession(MarketSession),
+    EmaPrice(Option<Price>),
+    EmaConfidence(Option<Price>),
+    FeedUpdateTimestamp(Option<TimestampUs>),
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

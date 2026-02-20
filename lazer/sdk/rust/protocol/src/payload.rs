@@ -29,13 +29,14 @@ pub struct PayloadFeedData {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[repr(u8)]
 pub enum PayloadPropertyValue {
     Price(Option<Price>),
     BestBidPrice(Option<Price>),
     BestAskPrice(Option<Price>),
     PublisherCount(Option<u16>),
     Exponent(i16),
-    FeedUpdateTimestamp(Option<TimestampUs>),
+    FeedUpdateTimestamp(Option<TimestampUs>) = 12,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

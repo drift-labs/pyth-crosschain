@@ -133,7 +133,7 @@ pub enum PriceFeedProperty {
     BestAskPrice,
     PublisherCount,
     Exponent,
-    FeedUpdateTimestamp,
+    FeedUpdateTimestamp = 12,
     // More fields may be added later.
 }
 

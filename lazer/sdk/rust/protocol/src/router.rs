@@ -133,7 +133,7 @@ pub enum PriceFeedProperty {
     BestAskPrice,
     PublisherCount,
     Exponent,
-    FundingTimestamp,
+    FeedUpdateTimestamp,
     // More fields may be added later.
 }
 
@@ -403,7 +403,7 @@ pub struct ParsedFeedPayload {
     pub exponent: Option<i16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    pub funding_timestamp: Option<TimestampUs>,
+    pub feed_update_timestamp: Option<TimestampUs>,
     // More fields may be added later.
 }
 
@@ -421,7 +421,7 @@ impl ParsedFeedPayload {
             best_ask_price: None,
             publisher_count: None,
             exponent: None,
-            funding_timestamp: None,
+            feed_update_timestamp: None,
         };
         for &property in properties {
             match property {
@@ -440,8 +440,8 @@ impl ParsedFeedPayload {
                 PriceFeedProperty::Exponent => {
                     output.exponent = exponent;
                 }
-                PriceFeedProperty::FundingTimestamp => {
-                    output.funding_timestamp = data.funding_timestamp;
+                PriceFeedProperty::FeedUpdateTimestamp => {
+                    output.feed_update_timestamp = data.feed_update_timestamp;
                 }
             }
         }
@@ -460,7 +460,7 @@ impl ParsedFeedPayload {
             best_ask_price: data.best_ask_price,
             publisher_count: data.publisher_count,
             exponent,
-            funding_timestamp: data.funding_timestamp,
+            feed_update_timestamp: data.feed_update_timestamp,
         }
     }
 }

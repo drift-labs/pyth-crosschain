@@ -35,7 +35,7 @@ pub enum PayloadPropertyValue {
     BestAskPrice(Option<Price>),
     PublisherCount(Option<u16>),
     Exponent(i16),
-    FundingTimestamp(Option<TimestampUs>),
+    FeedUpdateTimestamp(Option<TimestampUs>),
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -44,7 +44,7 @@ pub struct AggregatedPriceFeedData {
     pub best_bid_price: Option<Price>,
     pub best_ask_price: Option<Price>,
     pub publisher_count: Option<u16>,
-    pub funding_timestamp: Option<TimestampUs>,
+    pub feed_update_timestamp: Option<TimestampUs>,
 }
 
 pub const PAYLOAD_FORMAT_MAGIC: u32 = 2479346549;
@@ -79,8 +79,10 @@ impl PayloadData {
                             PriceFeedProperty::Exponent => {
                                 PayloadPropertyValue::Exponent(*exponent)
                             }
-                            PriceFeedProperty::FundingTimestamp => {
-                                PayloadPropertyValue::FundingTimestamp(feed.funding_timestamp)
+                            PriceFeedProperty::FeedUpdateTimestamp => {
+                                PayloadPropertyValue::FeedUpdateTimestamp(
+                                    feed.feed_update_timestamp,
+                                )
                             }
                         })
                         .collect(),
@@ -119,8 +121,8 @@ impl PayloadData {
                         writer.write_u8(PriceFeedProperty::Exponent as u8)?;
                         writer.write_i16::<BO>(*exponent)?;
                     }
-                    PayloadPropertyValue::FundingTimestamp(timestamp) => {
-                        writer.write_u8(PriceFeedProperty::FundingTimestamp as u8)?;
+                    PayloadPropertyValue::FeedUpdateTimestamp(timestamp) => {
+                        writer.write_u8(PriceFeedProperty::FeedUpdateTimestamp as u8)?;
                         write_option_timestamp_us::<BO>(&mut writer, *timestamp)?;
                     }
                 }

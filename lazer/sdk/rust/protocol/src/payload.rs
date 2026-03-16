@@ -29,12 +29,14 @@ pub struct PayloadFeedData {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[repr(u8)]
 pub enum PayloadPropertyValue {
     Price(Option<Price>),
     BestBidPrice(Option<Price>),
     BestAskPrice(Option<Price>),
     PublisherCount(Option<u16>),
     Exponent(i16),
+    FeedUpdateTimestamp(Option<TimestampUs>) = 12,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -43,6 +45,7 @@ pub struct AggregatedPriceFeedData {
     pub best_bid_price: Option<Price>,
     pub best_ask_price: Option<Price>,
     pub publisher_count: Option<u16>,
+    pub feed_update_timestamp: Option<TimestampUs>,
 }
 
 pub const PAYLOAD_FORMAT_MAGIC: u32 = 2479346549;
@@ -76,6 +79,11 @@ impl PayloadData {
                             }
                             PriceFeedProperty::Exponent => {
                                 PayloadPropertyValue::Exponent(*exponent)
+                            }
+                            PriceFeedProperty::FeedUpdateTimestamp => {
+                                PayloadPropertyValue::FeedUpdateTimestamp(
+                                    feed.feed_update_timestamp,
+                                )
                             }
                         })
                         .collect(),
@@ -113,6 +121,10 @@ impl PayloadData {
                     PayloadPropertyValue::Exponent(exponent) => {
                         writer.write_u8(PriceFeedProperty::Exponent as u8)?;
                         writer.write_i16::<BO>(*exponent)?;
+                    }
+                    PayloadPropertyValue::FeedUpdateTimestamp(timestamp) => {
+                        writer.write_u8(PriceFeedProperty::FeedUpdateTimestamp as u8)?;
+                        write_option_timestamp_us::<BO>(&mut writer, *timestamp)?;
                     }
                 }
             }
@@ -193,6 +205,13 @@ fn write_option_u16<BO: ByteOrder>(
 fn read_option_u16<BO: ByteOrder>(mut reader: impl Read) -> std::io::Result<Option<u16>> {
     let value = reader.read_u16::<BO>()?;
     Ok(Some(value))
+}
+
+fn write_option_timestamp_us<BO: ByteOrder>(
+    mut writer: impl Write,
+    value: Option<TimestampUs>,
+) -> std::io::Result<()> {
+    writer.write_u64::<BO>(value.map_or(0, |v| v.0))
 }
 
 pub const BINARY_UPDATE_FORMAT_MAGIC: u32 = 1937213467;

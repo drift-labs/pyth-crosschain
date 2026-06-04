@@ -21,8 +21,8 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@pythnetwork/pyth-aptos-js": "^0.2.0",
-    "aptos": "^1.3.14",
+    "@pythnetwork/pyth-aptos-js": "^1.5.0",
+    "aptos": "^1.22.1",
     "ethers": "^5.7.1",
     "js-sha3": "^0.8.0",
     "yargs": "^17.5.1"

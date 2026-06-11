@@ -61,7 +61,7 @@
     "@pythnetwork/solana-utils": "workspace:*",
     "express": "^4.19.2",
     "jito-ts": "^3.0.1",
-    "joi": "^17.6.0",
+    "joi": "^18.2.1",
     "yaml": "^2.1.1",
     "yargs": "^17.5.1"
   }
